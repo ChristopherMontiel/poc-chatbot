@@ -39,6 +39,5 @@ async def whatsapp_webhook(request: Request):
 
     # Responder usando Twilio
     resp = MessagingResponse()
-    #resp.message(reply)
-    resp.message("Respuesta generica de prueba")
+    resp.message(reply)
     return PlainTextResponse(str(resp))
