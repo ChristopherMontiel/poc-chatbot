@@ -10,13 +10,16 @@ from fastapi.responses import PlainTextResponse
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
 
+# Obtener la API key desde la variable de entorno
+api_key = os.getenv("GROQ_API_KEY")
+if not api_key:
+    raise ValueError("No se encontró la API key en las variables de entorno")
+
+# Inicializa el cliente de Groq con la API key obtenida
+client = Groq(api_key=api_key)
+
 # Inicializa FastAPI
 app = FastAPI()
-
-# URL base para el LLM local
-client = Groq(
-    api_key="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"
-)
 
 # Diccionario para almacenar el historial de conversación por usuario
 conversation_history = {}
