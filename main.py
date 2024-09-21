@@ -4,6 +4,8 @@ import requests
 from dotenv import load_dotenv
 import os
 from groq import Groq
+from fastapi.responses import PlainTextResponse
+
 
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
@@ -37,5 +39,6 @@ async def whatsapp_webhook(request: Request):
 
     # Responder usando Twilio
     resp = MessagingResponse()
-    resp.message(reply)
-    return str(resp)
+    #resp.message(reply)
+    resp.message("Respuesta generica de prueba")
+    return PlainTextResponse(str(resp))
