@@ -36,6 +36,6 @@ async def whatsapp_webhook(request: Request):
         reply = f"Lo siento, hubo un error: {str(e)}"
 
     # Responder usando Twilio
-    # resp = MessagingResponse()
-    # resp.message(reply)
-    return str(reply)
+    resp = MessagingResponse()
+    resp.message(reply)
+    return str(resp)
