@@ -6,7 +6,6 @@ import os
 from groq import Groq
 from fastapi.responses import PlainTextResponse
 
-
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
 
@@ -24,20 +23,24 @@ app = FastAPI()
 # Diccionario para almacenar el historial de conversación por usuario
 conversation_history = {}
 
+# Función para cargar el prompt inicial desde un archivo
+def load_initial_prompt(filename='prompt.txt'):
+    with open(filename, 'r', encoding='utf-8') as file:
+        return file.read().strip()
+
 # Ruta para recibir los mensajes de WhatsApp
 @app.post("/whatsapp")
 async def whatsapp_webhook(request: Request):
     # Obtén el contenido del mensaje entrante
     form_data = await request.form()
     incoming_msg = form_data.get('Body')
-    # Obtenemos el número de teléfono del usuario
-    # Si no se proporciona el campo 'From', usar un valor predeterminado para las pruebas
     user_number = form_data.get('From', 'test-user')  # Simulamos un número para las pruebas
 
     # Si el usuario no tiene historial, inicializamos su historial
     if user_number not in conversation_history:
+        initial_prompt = load_initial_prompt()
         conversation_history[user_number] = [
-            {"role": "system", "content": "Eres un asistente amigable, te debes expresar con emojis y siempre debes dar respuestas sencillas, cortas y en español."}
+            {"role": "system", "content": initial_prompt}
         ]
 
     # Agregamos el nuevo mensaje del usuario al historial
@@ -45,7 +48,8 @@ async def whatsapp_webhook(request: Request):
 
     print(f"Mensaje recibido: {incoming_msg}")
     print(f"Historial recibido: {conversation_history[user_number]}")
-# Procesa el mensaje usando OpenAI (GPT)
+
+    # Procesa el mensaje usando OpenAI (GPT)
     try:
         chat_completion = client.chat.completions.create(
             model="llama3-8b-8192",
@@ -59,6 +63,4 @@ async def whatsapp_webhook(request: Request):
         reply = f"Lo siento, hubo un error: {str(e)}"
 
     # Responder usando Twilio
-    #resp = MessagingResponse()
-    #resp.message(reply)
     return PlainTextResponse(str(reply))
